@@ -1,0 +1,122 @@
+---
+title: "Assignment 3"
+author: "Agneesh"
+date: "2024-08-19"
+output: html_document
+---
+1,
+```{r}
+rm(list=ls())
+
+library(ISLR)
+```
+
+a,
+```{r}
+library(ISLR2)
+library(MASS)
+library(class)
+summary(Auto)
+```
+
+```{r}
+attach(Auto)
+```
+
+```{r}
+m<-mean(Auto$mpg)
+mpg01<-ifelse(Auto$mpg>m,yes=1,no=0)
+Auto<-data.frame(Auto,mpg01)
+```
+b,
+
+```{r}
+cor(Auto[,-9])
+```
+
+
+```{r}
+pairs(Auto)
+```
+
+c,
+```{r}
+Auto <- data.frame(mpg01, apply(cbind(cylinders, weight, displacement, horsepower, acceleration), 
+                                2, scale), year)
+```
+
+
+```{r}
+set.seed(0)
+tn=0.3
+sub<-sample(1:nrow(Auto),round(nrow(Auto)*tn),rep=FALSE)
+data_train<-Auto[-sub,]
+data_test<-Auto[sub,]
+dim(data_train)
+```
+
+
+```{r}
+dim(data_test)
+```
+ 
+d, 
+```{r}
+LDA<-lda(mpg01~cylinders+weight+displacement+horsepower,data=data_train)
+LDA_pred<-predict(LDA,data_test)
+mean(LDA_pred$class!=data_test$mpg01)
+```
+
+
+```{r}
+table(LDA_pred$class,data_test$mpg01)
+```
+
+e,
+```{r}
+QDA<-qda(mpg01~cylinders+weight+displacement+horsepower,data=data_train)
+QDA_pred<-predict(QDA,data_test)
+mean(QDA_pred$class!=data_test$mpg01) 
+```
+
+
+```{r}
+table(QDA_pred$class,data_test$mpg01)
+```
+
+f,
+```{r}
+LR<-glm(mpg01~cylinders+weight+displacement+horsepower,data=data_train,family = binomial)
+LR_prob<-predict(LR,data_test,type="response")
+LR_pred<-rep(0,length(LR_prob))
+LR_pred[LR_prob>0.5]<-1
+mean(LR_pred!=data_test$mpg01)
+```
+
+g,
+
+```{r}
+knn_pred1 <-knn(data_train[,-9], data_test[,-9], data_train$mpg01, k = 1)
+mean(knn_pred1!=data_test$mpg01)
+```
+
+
+```{r}
+knn_pred2 <-knn(data_train[,-9], data_test[,-9], data_train$mpg01, k = 2)
+mean(knn_pred2!=data_test$mpg01)
+```
+
+
+```{r}
+knn_pred3 <-knn(data_train[,-9], data_test[,-9], data_train$mpg01, k = 3)
+mean(knn_pred3!=data_test$mpg01)
+```
+
+
+```{r}
+knn_pred4 <-knn(data_train[,-9], data_test[,-9], data_train$mpg01, k = 5)
+mean(knn_pred4!=data_test$mpg01)
+```
+
+
+
